@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vitalog — Jurnal Aktivitas Harian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient background blobs for glassmorphism depth -->
+  <div class="ambient" aria-hidden="true">
+    <span class="blob blob-a"></span>
+    <span class="blob blob-b"></span>
+    <span class="blob blob-c"></span>
+  </div>
+
+  <div class="app">
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12h3l2 7 4-14 2 7h5" />
+          </svg>
+        </span>
+        <div class="brand-text">
+          <span class="brand-name">Vitalog</span>
+          <span class="brand-tag">Jurnal aktivitas harian</span>
+        </div>
+      </div>
+      <div class="topbar-date" id="todayDate">—</div>
+    </header>
+
+    <main>
+
+      <!-- STATS -->
+      <section class="stats-grid" id="statsGrid" aria-label="Ringkasan statistik">
+        <article class="stat-card" style="--d:0">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="4"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+          </div>
+          <span class="stat-label">Total Hari</span>
+          <span class="stat-value" id="statHari">0</span>
+        </article>
+
+        <article class="stat-card" style="--d:1">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20v-4M18 20v-4M4 12h2l2-3 3 3h2l3-3 2 3h2"/></svg>
+          </div>
+          <span class="stat-label">Total Push Up</span>
+          <span class="stat-value" id="statPushup">0</span>
+        </article>
+
+        <article class="stat-card" style="--d:2">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M9 20l2-7-3-2 1-4 3 2 2-2 3 3-2 2 2 8"/></svg>
+          </div>
+          <span class="stat-label">Total Sit Up</span>
+          <span class="stat-value" id="statSitup">0</span>
+        </article>
+
+        <article class="stat-card" style="--d:3">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M6 9h12M6 15h12"/></svg>
+          </div>
+          <span class="stat-label">Total Pull Up</span>
+          <span class="stat-value" id="statPullup">0</span>
+        </article>
+
+        <article class="stat-card" style="--d:4">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          </div>
+          <span class="stat-label">Menit Plank</span>
+          <span class="stat-value" id="statPlank">0</span>
+        </article>
+
+        <article class="stat-card" style="--d:5">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4a1.5 1.5 0 1 1 0-.001M8 20l1.5-5L7 13l1-4 3 1 1-2M12 9l2 2-1 5 3 3"/></svg>
+          </div>
+          <span class="stat-label">Menit Jalan</span>
+          <span class="stat-value" id="statJalan">0</span>
+        </article>
+      </section>
+
+      <div class="layout">
+
+        <!-- FORM -->
+        <section class="panel form-panel" aria-label="Form aktivitas">
+          <div class="panel-head">
+            <h2 id="formTitle">Tambah Aktivitas</h2>
+            <p class="panel-sub" id="formSub">Catat progres tubuh dan pola makanmu hari ini.</p>
+          </div>
+
+          <form id="entryForm" novalidate>
+            <input type="hidden" id="entryId" value="" />
+
+            <div class="field">
+              <label for="tanggal">Tanggal</label>
+              <input type="date" id="tanggal" required />
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="pushup">Push Up</label>
+                <input type="number" id="pushup" min="0" placeholder="0" inputmode="numeric" />
+              </div>
+              <div class="field">
+                <label for="situp">Sit Up</label>
+                <input type="number" id="situp" min="0" placeholder="0" inputmode="numeric" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="pullup">Pull Up</label>
+                <input type="number" id="pullup" min="0" placeholder="0" inputmode="numeric" />
+              </div>
+              <div class="field">
+                <label for="plank">Plank (menit)</label>
+                <input type="number" id="plank" min="0" placeholder="0" inputmode="numeric" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="jalan">Jalan (menit)</label>
+              <input type="number" id="jalan" min="0" placeholder="0" inputmode="numeric" />
+            </div>
+
+            <div class="field">
+              <label for="sarapan">Sarapan</label>
+              <input type="text" id="sarapan" placeholder="Contoh: 2 telur rebus" />
+            </div>
+
+            <div class="field">
+              <label for="makansiang">Makan Siang</label>
+              <input type="text" id="makansiang" placeholder="Contoh: Ayam & nasi merah" />
+            </div>
+
+            <div class="field">
+              <label for="makanmalam">Makan Malam</label>
+              <input type="text" id="makanmalam" placeholder="Contoh: Ikan bakar" />
+            </div>
+
+            <div class="field">
+              <label for="lainnya">Lainnya</label>
+              <input type="text" id="lainnya" placeholder="Catatan tambahan" />
+            </div>
+
+            <div class="form-actions">
+              <button type="button" id="cancelBtn" class="btn btn-ghost hidden">Batal</button>
+              <button type="submit" id="submitBtn" class="btn btn-primary">
+                <span class="btn-label">Simpan</span>
+                <span class="btn-spinner hidden" aria-hidden="true"></span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- TABLE -->
+        <section class="panel table-panel" aria-label="Riwayat aktivitas">
+          <div class="panel-head panel-head-row">
+            <div>
+              <h2>Riwayat Aktivitas</h2>
+              <p class="panel-sub">Semua catatan tersimpan, terbaru di atas.</p>
+            </div>
+            <button id="refreshBtn" class="btn btn-icon" title="Muat ulang" type="button">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v6h-6"/></svg>
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <div class="table-loading" id="tableLoading">
+              <span class="spinner"></span>
+              <span>Memuat data…</span>
+            </div>
+            <div class="table-empty hidden" id="tableEmpty">
+              Belum ada catatan. Tambahkan aktivitas pertamamu di form sebelah kiri.
+            </div>
+            <table class="data-table hidden" id="dataTable">
+              <thead>
+                <tr>
+                  <th>Hari</th>
+                  <th>Push Up</th>
+                  <th>Sit Up</th>
+                  <th>Pull Up</th>
+                  <th>Plank</th>
+                  <th>Jalan</th>
+                  <th>Sarapan</th>
+                  <th>Makan Siang</th>
+                  <th>Makan Malam</th>
+                  <th>Lainnya</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <span>Vitalog · disinkronkan dengan Google Sheets</span>
+    </footer>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div class="modal-overlay hidden" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-card">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+      </div>
+      <h3 id="confirmTitle">Hapus catatan ini?</h3>
+      <p>Yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="modalCancel" type="button">Batal</button>
+        <button class="btn btn-danger" id="modalConfirm" type="button">
+          <span class="btn-label">Hapus</span>
+          <span class="btn-spinner hidden" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
