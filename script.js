@@ -114,6 +114,35 @@ function sumField(entries, key) {
   }, 0);
 }
 
+/**
+ * Turn a raw row from the API into a fixed shape by matching header
+ * keywords instead of exact header text. This keeps the site working even
+ * if the sheet header has extra spaces, different casing, or different
+ * bracket characters than expected (e.g. "Plank (Menit)" vs "Plank(menit)").
+ */
+function normalizeRow(raw) {
+  const findVal = (fragment) => {
+    const key = Object.keys(raw).find((k) =>
+      k.toLowerCase().replace(/[^a-z0-9]/g, "").includes(fragment)
+    );
+    return key !== undefined ? raw[key] : undefined;
+  };
+
+  return {
+    ID: raw.ID ?? raw.Id ?? raw.id ?? findVal("id"),
+    Hari: findVal("hari"),
+    PushUp: findVal("pushup"),
+    SitUp: findVal("situp"),
+    PullUp: findVal("pullup"),
+    Plank: findVal("plank"),
+    Jalan: findVal("jalan"),
+    Sarapan: findVal("sarapan"),
+    MakanSiang: findVal("makansiang"),
+    MakanMalam: findVal("makanmalam"),
+    Lainnya: findVal("lainnya"),
+  };
+}
+
 /** Safe display for table cells: empty/undefined -> "-" */
 function displayVal(v) {
   if (v === undefined || v === null || v === "") return "—";
@@ -207,11 +236,11 @@ function toast(message, type = "success") {
 function renderStats() {
   const entries = state.entries;
   dom.statHari.textContent = entries.length;
-  dom.statPushup.textContent = sumField(entries, "Push Up");
-  dom.statSitup.textContent = sumField(entries, "Sit Up");
-  dom.statPullup.textContent = sumField(entries, "Pull Up");
-  dom.statPlank.textContent = sumField(entries, "Plank (Menit)");
-  dom.statJalan.textContent = sumField(entries, "Jalan (Menit)");
+  dom.statPushup.textContent = sumField(entries, "PushUp");
+  dom.statSitup.textContent = sumField(entries, "SitUp");
+  dom.statPullup.textContent = sumField(entries, "PullUp");
+  dom.statPlank.textContent = sumField(entries, "Plank");
+  dom.statJalan.textContent = sumField(entries, "Jalan");
 }
 
 function renderTable() {
@@ -237,14 +266,14 @@ function renderTable() {
       return `
         <tr style="animation-delay:${Math.min(i, 8) * 35}ms">
           <td class="cell-day">${escapeHtml(displayVal(row.Hari))}</td>
-          <td class="cell-num">${escapeHtml(displayVal(row["Push Up"]))}</td>
-          <td class="cell-num">${escapeHtml(displayVal(row["Sit Up"]))}</td>
-          <td class="cell-num">${escapeHtml(displayVal(row["Pull Up"]))}</td>
-          <td class="cell-num">${escapeHtml(displayVal(row["Plank (Menit)"]))}</td>
-          <td class="cell-num">${escapeHtml(displayVal(row["Jalan (Menit)"]))}</td>
+          <td class="cell-num">${escapeHtml(displayVal(row.PushUp))}</td>
+          <td class="cell-num">${escapeHtml(displayVal(row.SitUp))}</td>
+          <td class="cell-num">${escapeHtml(displayVal(row.PullUp))}</td>
+          <td class="cell-num">${escapeHtml(displayVal(row.Plank))}</td>
+          <td class="cell-num">${escapeHtml(displayVal(row.Jalan))}</td>
           <td class="cell-muted" title="${escapeHtml(row.Sarapan ?? "")}">${escapeHtml(displayVal(row.Sarapan))}</td>
-          <td class="cell-muted" title="${escapeHtml(row["Makan Siang"] ?? "")}">${escapeHtml(displayVal(row["Makan Siang"]))}</td>
-          <td class="cell-muted" title="${escapeHtml(row["Makan Malam"] ?? "")}">${escapeHtml(displayVal(row["Makan Malam"]))}</td>
+          <td class="cell-muted" title="${escapeHtml(row.MakanSiang ?? "")}">${escapeHtml(displayVal(row.MakanSiang))}</td>
+          <td class="cell-muted" title="${escapeHtml(row.MakanMalam ?? "")}">${escapeHtml(displayVal(row.MakanMalam))}</td>
           <td class="cell-muted" title="${escapeHtml(row.Lainnya ?? "")}">${escapeHtml(displayVal(row.Lainnya))}</td>
           <td>
             <div class="row-actions">
@@ -275,7 +304,7 @@ async function loadData({ silent = false } = {}) {
   if (!silent) showTableLoading();
   try {
     const data = await api.fetchAll();
-    state.entries = data;
+    state.entries = data.map(normalizeRow);
     renderStats();
     renderTable();
   } catch (err) {
@@ -301,14 +330,14 @@ function enterEditMode(row) {
   state.editingId = row.ID;
   dom.entryId.value = row.ID;
   dom.tanggal.value = parseApiDateToIso(row.Hari);
-  dom.pushup.value = row["Push Up"] === "-" ? "" : row["Push Up"] ?? "";
-  dom.situp.value = row["Sit Up"] === "-" ? "" : row["Sit Up"] ?? "";
-  dom.pullup.value = row["Pull Up"] === "-" ? "" : row["Pull Up"] ?? "";
-  dom.plank.value = row["Plank (Menit)"] === "-" ? "" : row["Plank (Menit)"] ?? "";
-  dom.jalan.value = row["Jalan (Menit)"] === "-" ? "" : row["Jalan (Menit)"] ?? "";
+  dom.pushup.value = row.PushUp === "-" ? "" : row.PushUp ?? "";
+  dom.situp.value = row.SitUp === "-" ? "" : row.SitUp ?? "";
+  dom.pullup.value = row.PullUp === "-" ? "" : row.PullUp ?? "";
+  dom.plank.value = row.Plank === "-" ? "" : row.Plank ?? "";
+  dom.jalan.value = row.Jalan === "-" ? "" : row.Jalan ?? "";
   dom.sarapan.value = row.Sarapan ?? "";
-  dom.makansiang.value = row["Makan Siang"] ?? "";
-  dom.makanmalam.value = row["Makan Malam"] ?? "";
+  dom.makansiang.value = row.MakanSiang ?? "";
+  dom.makanmalam.value = row.MakanMalam ?? "";
   dom.lainnya.value = row.Lainnya ?? "";
 
   dom.formTitle.textContent = "Edit Aktivitas";
